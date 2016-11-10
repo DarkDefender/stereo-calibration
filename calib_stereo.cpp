@@ -121,7 +121,8 @@ int main(int argc, char const *argv[])
   
   cout << "Read intrinsics" << endl;
   
-  stereoCalibrate(object_points, left_img_points, right_img_points, K1, D1, K2, D2, img1.size(), R, T, E, F);
+  stereoCalibrate(object_points, left_img_points, right_img_points, K1, D1, K2, D2, img1.size(), R, T, E, F, flag,
+			TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 30, 1e-6));
 
   cv::FileStorage fs1(out_file, cv::FileStorage::WRITE);
   fs1 << "K1" << K1;
@@ -137,8 +138,10 @@ int main(int argc, char const *argv[])
 
   printf("Starting Rectification\n");
 
+  flag = 0; // reset flag
+  float alpha = 0.0; // only show valid pixels.
   cv::Mat R1, R2, P1, P2, Q;
-  stereoRectify(K1, D1, K2, D2, img1.size(), R, T, R1, R2, P1, P2, Q);
+  stereoRectify(K1, D1, K2, D2, img1.size(), R, T, R1, R2, P1, P2, Q, flag, alpha, cvSize(0,0));
 
   fs1 << "R1" << R1;
   fs1 << "R2" << R2;
