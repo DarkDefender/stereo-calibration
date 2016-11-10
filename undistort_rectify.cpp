@@ -37,7 +37,7 @@ int main(int argc, char const *argv[])
 	Mat D1, D2;
 	Mat img1 = imread(leftimg_filename, CV_LOAD_IMAGE_COLOR);
 	Mat img2 = imread(rightimg_filename, CV_LOAD_IMAGE_COLOR);
-	cout << "Rectifying " << leftimg_filename << "..." << endl;
+	cout << "Rectifying " << leftimg_filename << "...";
 	cv::FileStorage fs1(calib_file, cv::FileStorage::READ);
 	fs1["K1"] >> K1;
 	fs1["K2"] >> K2;
