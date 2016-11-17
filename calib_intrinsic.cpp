@@ -16,59 +16,74 @@ vector< vector< Point2f > > left_img_points;
 
 Mat img, gray;
 Size im_size;
+int img_width, img_height, img_fps;
 
-void setup_calibration(int board_width, int board_height, int num_imgs, 
-                       float square_size, char* imgs_directory, char* imgs_filename,
-                       char* extension) {
-  Size board_size = Size(board_width, board_height);
-  int board_n = board_width * board_height;
+void setup_calibration(int board_width, int board_height,
+		//int num_imgs, 
+		float square_size, 
+		//char* imgs_directory, 
+		char* imgs_filename
+		//, char* extension
+		) {
+	
+	Size board_size = Size(board_width, board_height);
+	int board_n = board_width * board_height;
 
-  for (int k = 1; k <= num_imgs; k++) {
-    char img_file[100];
-    sprintf(img_file, "%s%s%d.%s", imgs_directory, imgs_filename, k, extension);
-    img = imread(img_file, CV_LOAD_IMAGE_COLOR);
-    cv::cvtColor(img, gray, CV_BGR2GRAY);
+	cv::VideoCapture img_seq(imgs_filename);
+    int num_imgs = img_seq.get(CV_CAP_PROP_FRAME_COUNT);
+    img_fps = img_seq.get(CV_CAP_PROP_FPS);
+	for (int k = 1; k <= num_imgs; k++) {
+		/*
+		char img_file[100];
+		sprintf(img_file, "%s%s%d.%s", imgs_directory, imgs_filename, k, extension);
+		img = imread(img_file, CV_LOAD_IMAGE_COLOR);
+		*/
+		img_seq >> img;
+		
+		cv::cvtColor(img, gray, CV_BGR2GRAY);
 
-    bool found = false;
-    found = cv::findChessboardCorners(img, board_size, corners,
-                                      CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
-    if (found)
-    {
-      cornerSubPix(gray, corners, cv::Size(5, 5), cv::Size(-1, -1),
-                   TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.1));
-      drawChessboardCorners(gray, board_size, corners, found);
-    }
-    
-    vector< Point3f > obj;
-    for (int i = 0; i < board_height; i++)
-      for (int j = 0; j < board_width; j++)
-        obj.push_back(Point3f((float)j * square_size, (float)i * square_size, 0));
+		bool found = false;
+		found = cv::findChessboardCorners(img, board_size, corners,
+				CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
+		if (found)
+		{
+			cornerSubPix(gray, corners, cv::Size(5, 5), cv::Size(-1, -1),
+					TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.1));
+			drawChessboardCorners(gray, board_size, corners, found);
+		}
 
-    if (found) {
-      cout << k << ". Found corners!" << endl;
-      image_points.push_back(corners);
-      object_points.push_back(obj);
-    }
-  }
+		vector< Point3f > obj;
+		for (int i = 0; i < board_height; i++)
+			for (int j = 0; j < board_width; j++)
+				obj.push_back(Point3f((float)j * square_size, (float)i * square_size, 0));
+
+		if (found) {
+			cout << k << ". Found corners!" << endl;
+			image_points.push_back(corners);
+			object_points.push_back(obj);
+		}
+	}
+	img_width = img.cols;
+	img_height = img.rows; 
 }
 
 int main(int argc, char const **argv)
 {
   int board_width, board_height, num_imgs;
   float square_size;
-  char* imgs_directory;
+  //char* imgs_directory;
   char* imgs_filename;
   char* out_file;
-  char* extension;
+  //char* extension;
 
   static struct poptOption options[] = {
     { "board_width",'w',POPT_ARG_INT,&board_width,0,"Checkerboard width","NUM" },
     { "board_height",'h',POPT_ARG_INT,&board_height,0,"Checkerboard height","NUM" },
-    { "num_imgs",'n',POPT_ARG_INT,&num_imgs,0,"Number of checkerboard images","NUM" },
+    //{ "num_imgs",'n',POPT_ARG_INT,&num_imgs,0,"Number of checkerboard images","NUM" },
     { "square_size",'s',POPT_ARG_FLOAT,&square_size,0,"Size of checkerboard square","NUM" },
-    { "imgs_directory",'d',POPT_ARG_STRING,&imgs_directory,0,"Directory containing images","STR" },
+    //{ "imgs_directory",'d',POPT_ARG_STRING,&imgs_directory,0,"Directory containing images","STR" },
     { "imgs_filename",'i',POPT_ARG_STRING,&imgs_filename,0,"Image filename","STR" },
-    { "extension",'e',POPT_ARG_STRING,&extension,0,"Image extension","STR" },
+    //{ "extension",'e',POPT_ARG_STRING,&extension,0,"Image extension","STR" },
     { "out_file",'o',POPT_ARG_STRING,&out_file,0,"Output calibration filename (YML)","STR" },
     POPT_AUTOHELP
     { NULL, 0, 0, NULL, 0, NULL, NULL }
@@ -78,8 +93,13 @@ int main(int argc, char const **argv)
   int c;
   while((c = popt.getNextOpt()) >= 0) {}
 
-  setup_calibration(board_width, board_height, num_imgs, square_size,
-                   imgs_directory, imgs_filename, extension);
+  setup_calibration(board_width, board_height,
+				   // num_imgs, 
+				   square_size,
+                   //imgs_directory, 
+				   imgs_filename
+				   //, extension
+				   );
 
   printf("Starting Calibration\n");
   Mat K;
@@ -96,6 +116,9 @@ int main(int argc, char const **argv)
   fs << "board_width" << board_width;
   fs << "board_height" << board_height;
   fs << "square_size" << square_size;
+  fs << "img_width" << img_width;
+  fs << "img_height" << img_height;
+  fs << "fps" << img_fps;
   printf("Done Calibration\n");
 
   return 0;
