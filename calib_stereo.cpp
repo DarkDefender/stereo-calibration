@@ -127,6 +127,7 @@ int main(int argc, char const *argv[])
 	Vec3d T;
 	Mat D1, D2;
 	int l_width, l_height, r_width, r_height;
+	float fps;
 
 	fsl["K"] >> K1;
 	fsr["K"] >> K2;
@@ -136,7 +137,7 @@ int main(int argc, char const *argv[])
 	fsl["img_height"] >> l_height;
 	fsr["img_width"] >> r_width;
 	fsr["img_height"] >> r_height;
-
+    fsl["fps"] >> fps;
 	int flag = 0;
 	flag |= CV_CALIB_FIX_INTRINSIC;
 
@@ -154,7 +155,7 @@ int main(int argc, char const *argv[])
 	fs1 << "T" << T;
 	fs1 << "E" << E;
 	fs1 << "F" << F;
-
+    fs1 << "fps" << fps;
 	printf("Done Calibration\n");
 
 	printf("Starting Rectification\n");
