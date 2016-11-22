@@ -108,6 +108,9 @@ int main(int argc, char const **argv)
   int flag = 0;
   flag |= CV_CALIB_FIX_K4;
   flag |= CV_CALIB_FIX_K5;
+  // add more flags!
+  // flag |= CV_CALIB_FIX_PRINCIPAL_POINT;
+  // flag |= CV_CALIB_ZERO_TANGENT_DIST;
   calibrateCamera(object_points, image_points, img.size(), K, D, rvecs, tvecs, flag);
 
   FileStorage fs(out_file, FileStorage::WRITE);

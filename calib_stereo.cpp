@@ -139,7 +139,11 @@ int main(int argc, char const *argv[])
 	fsr["img_height"] >> r_height;
     fsl["fps"] >> fps;
 	int flag = 0;
-	flag |= CV_CALIB_FIX_INTRINSIC;
+	//flag |= CV_CALIB_FIX_INTRINSIC;
+	flag |= CV_CALIB_USE_INTRINSIC_GUESS;
+	flag |= CV_CALIB_ZERO_TANGENT_DIST;
+	// FIX_FOCAL_LENGTH
+	// SAME_FOCAL_LENGTH
 
 	cout << "Read intrinsics" << endl;
 
@@ -162,6 +166,7 @@ int main(int argc, char const *argv[])
 
 	cv::Mat R1, R2, P1, P2, Q;
 	flag = 0; // reset flag
+	flag |= CV_CALIB_ZERO_DISPARITY;
 	float alpha = 0.0; // only show valid pixels.
 	stereoRectify(K1, D1, K2, D2, img1.size(), R, T, R1, R2, P1, P2, Q, flag, alpha, cvSize(0,0));
 
@@ -170,10 +175,10 @@ int main(int argc, char const *argv[])
 	fs1 << "P1" << P1;
 	fs1 << "P2" << P2;
 	fs1 << "Q" << Q;
-	fs1 << "LEFT_WIDTH" << l_width;
-	fs1 << "RIGHT_WIDTH" << r_width;
-	fs1 << "LEFT_HEIGHT" << l_height;
-	fs1 << "RIGHT_HEIGHT" << r_height;
+	fs1 << "LEFT_width" << l_width;
+	fs1 << "RIGHT_width" << r_width;
+	fs1 << "LEFT_height" << l_height;
+	fs1 << "RIGHT_height" << r_height;
 
 
 	printf("Done Rectification\n");
