@@ -141,7 +141,7 @@ int main(int argc, char const *argv[])
 	int flag = 0;
 	//flag |= CV_CALIB_FIX_INTRINSIC;
 	flag |= CV_CALIB_USE_INTRINSIC_GUESS;
-	flag |= CV_CALIB_ZERO_TANGENT_DIST;
+	//flag |= CV_CALIB_ZERO_TANGENT_DIST;
 	// FIX_FOCAL_LENGTH
 	// SAME_FOCAL_LENGTH
 

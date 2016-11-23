@@ -111,7 +111,8 @@ int main(int argc, char const **argv)
   // add more flags!
   // flag |= CV_CALIB_FIX_PRINCIPAL_POINT;
   // flag |= CV_CALIB_ZERO_TANGENT_DIST;
-  calibrateCamera(object_points, image_points, img.size(), K, D, rvecs, tvecs, flag);
+  calibrateCamera(object_points, image_points, img.size(), K, D, rvecs, tvecs,
+		  flag, TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 30, DBL_EPSILON));
 
   FileStorage fs(out_file, FileStorage::WRITE);
   fs << "K" << K;
